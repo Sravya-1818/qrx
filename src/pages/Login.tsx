@@ -1,81 +1,92 @@
-
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Shield, Mail, Lock } from 'lucide-react';
+import { useState } from "react";
+import { supabase } from "../supabase"; // adjust path if needed
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isLogin, setIsLogin] = useState(true);
   const navigate = useNavigate();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // For now, just navigate to home - in a real app this would authenticate
-    localStorage.setItem('isAuthenticated', 'true');
-    navigate('/');
+
+    if (isLogin) {
+      // 🔐 LOGIN
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      if (error) {
+        alert("Login failed: " + error.message);
+      } else {
+        alert("Login successful!");
+        navigate("/");
+      }
+    } else {
+      // 📝 SIGN UP
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+      });
+      if (error) {
+        alert("Signup failed: " + error.message);
+      } else {
+        // 👤 Add to users table
+        const userId = data.user?.id;
+        const { error: insertError } = await supabase.from("users").insert([
+          {
+            id: userId,
+            email,
+          },
+        ]);
+        if (insertError) {
+          alert("User signup succeeded but data insert failed: " + insertError.message);
+        } else {
+          alert("Signup successful!");
+          navigate("/");
+        }
+      }
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <div className="flex items-center justify-center mb-4">
-            <Shield className="h-8 w-8 text-blue-600 mr-2" />
-            <span className="text-2xl font-bold text-blue-600">QRx</span>
-          </div>
-          <CardTitle className="text-2xl">Welcome Back</CardTitle>
-          <p className="text-gray-600">Sign in to your QRx account</p>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="Enter your email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="pl-10"
-                  required
-                />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="Enter your password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="pl-10"
-                  required
-                />
-              </div>
-            </div>
-            <Button type="submit" className="w-full">
-              Sign In
-            </Button>
-          </form>
-          <div className="mt-4 text-center">
-            <p className="text-sm text-gray-600">
-              Don't have an account?{' '}
-              <Link to="/signup" className="text-blue-600 hover:underline">
-                Sign up
-              </Link>
-            </p>
-          </div>
-        </CardContent>
-      </Card>
+    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+      <div className="bg-white p-8 rounded shadow-md w-full max-w-sm">
+        <h1 className="text-2xl font-bold mb-4">{isLogin ? "Login" : "Sign Up"}</h1>
+        <form onSubmit={handleSubmit}>
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full mb-4 p-2 border border-gray-300 rounded"
+            required
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full mb-4 p-2 border border-gray-300 rounded"
+            required
+          />
+          <button
+            type="submit"
+            className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
+          >
+            {isLogin ? "Login" : "Sign Up"}
+          </button>
+        </form>
+        <button
+          onClick={() => setIsLogin(!isLogin)}
+          className="mt-4 text-sm text-blue-600 underline"
+        >
+          {isLogin
+            ? "Don't have an account? Sign Up"
+            : "Already have an account? Login"}
+        </button>
+      </div>
     </div>
   );
 };
