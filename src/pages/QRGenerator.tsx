@@ -31,11 +31,11 @@ const QRGenerator = () => {
     }
 
     const profileData = {
-      id: user.id,
+      id: user.id, // UUID, make sure 'id' column in Supabase is UUID
       name,
       age,
       blood_group: bloodGroup,
-      condiitons: conditions,
+      conditions, // corrected spelling from 'condiitons'
       allergies,
       emergency_contact: emergencyContact,
       reports_url: reportsUrl,
@@ -49,7 +49,7 @@ const QRGenerator = () => {
       return;
     }
 
-    // Set the QR code to link to the public user profile page
+    // Set QR Code data linking to the user profile
     setQrData(`https://qrx-one.vercel.app/user/${user.id}`);
     setLoading(false);
   };
