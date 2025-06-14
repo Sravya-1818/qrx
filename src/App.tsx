@@ -10,7 +10,7 @@ import Index from "./pages/Index";
 import QRGenerator from "./pages/QRGenerator";
 import UserProfile from "./pages/UserProfile";
 import Login from "./pages/Login";
-import Signup from "./pages/Signup";
+
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -24,7 +24,7 @@ const AppContent = () => {
       {!hideHeader && <Header />}
       <Routes>
         <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
+       
         <Route path="/" element={
           <ProtectedRoute>
             <Index />
