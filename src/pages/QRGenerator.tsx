@@ -76,7 +76,9 @@ const QRGenerator = () => {
         </button>
       </form>
 
-      {errorMsg && <p className="mt-4 text-red-600 text-center font-medium">{errorMsg}</p>}
+      {errorMsg && (
+        <p className="mt-4 text-red-600 text-center font-medium">{errorMsg}</p>
+      )}
 
       {qrData && (
         <div className="mt-10 text-center">
