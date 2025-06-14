@@ -1,18 +1,13 @@
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import QRGenerator from "@/pages/QRGenerator";
-import UserProfile from "@/pages/UserProfile";
+import React from "react";
+import ReactDOM from "react-dom/client";
+import App from "./App";
+import "./index.css";
 
-function App() {
-  return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<QRGenerator />} />
-        <Route path="/user/:userId" element={<UserProfile />} />
-        {/* Optional: Add 404 fallback */}
-        <Route path="*" element={<div className="text-center mt-10">404 Not Found</div>} />
-      </Routes>
-    </Router>
-  );
-}
+ReactDOM.createRoot(document.getElementById("root")!).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+);
+
 
 export default App;
