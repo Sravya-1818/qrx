@@ -5,7 +5,17 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { User, Heart, Phone, AlertTriangle, Calendar, Shield } from 'lucide-react';
-import { getUserData, UserData } from '@/services/userData';
+import { supabase } from '@/lib/supabase';
+
+interface UserData {
+  name: string;
+  age: number;
+  bloodGroup: string;
+  allergies: string[];
+  medicalConditions: string[];
+  emergencyContact: string;
+  lastUpdated: string;
+}
 
 const UserProfile = () => {
   const params = useParams();
@@ -21,13 +31,28 @@ const UserProfile = () => {
 
       setLoading(true);
       try {
-        const data = await getUserData(userId);
-        if (data) {
-          setUserData(data);
-        } else {
+        const { data, error } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", userId)
+          .single();
+
+        if (error || !data) {
+          console.error("Error fetching user profile:", error);
           setError(true);
+        } else {
+          setUserData({
+            name: data.name,
+            age: parseInt(data.age) || 0,
+            bloodGroup: data["blood group"] ?? "Unknown",
+            allergies: data.allergies ? data.allergies.split(',').map((a: string) => a.trim()) : [],
+            medicalConditions: data.condiitons ? data.condiitons.split(',').map((c: string) => c.trim()) : [],
+            emergencyContact: data["exmergency contact"] ?? "Not Available",
+            lastUpdated: new Date().toLocaleDateString(),
+          });
         }
       } catch (err) {
+        console.error("Fetch failed:", err);
         setError(true);
       } finally {
         setLoading(false);
@@ -162,22 +187,6 @@ const UserProfile = () => {
                 <p className="text-gray-600 italic">No known conditions</p>
               )}
             </div>
-
-            {/* Medications */}
-            <div>
-              <h4 className="font-semibold text-blue-700 mb-2">Current Medications</h4>
-              {userData.medications.length > 0 ? (
-                <div className="space-y-1">
-                  {userData.medications.map((medication, index) => (
-                    <p key={index} className="text-gray-700 bg-blue-50 px-3 py-1 rounded">
-                      💊 {medication}
-                    </p>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-gray-600 italic">No current medications</p>
-              )}
-            </div>
           </CardContent>
         </Card>
 
@@ -191,10 +200,9 @@ const UserProfile = () => {
           </CardHeader>
           <CardContent className="p-6">
             <div className="bg-green-100 p-4 rounded-lg">
-              <p className="text-lg font-semibold text-green-800">{userData.emergencyContact.name}</p>
-              <p className="text-green-700">({userData.emergencyContact.relation})</p>
-              <a href={`tel:${userData.emergencyContact.phone}`} className="text-2xl font-bold text-green-600 hover:text-green-800">
-                📞 {userData.emergencyContact.phone}
+              <p className="text-lg font-semibold text-green-800">Emergency Contact</p>
+              <a href={`tel:${userData.emergencyContact}`} className="text-2xl font-bold text-green-600 hover:text-green-800">
+                📞 {userData.emergencyContact}
               </a>
             </div>
           </CardContent>
