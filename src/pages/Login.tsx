@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { supabase } from "src/lib/supasbase.ts"; // adjust path if needed
+import { supabase } from "src/lib/supasbase"; // adjust path if needed
 import { useNavigate } from "react-router-dom";
 
 const Login = () => {
