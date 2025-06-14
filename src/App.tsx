@@ -1,15 +1,16 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import QRGenerator from "./pages/QRGenerator";
-import UserProfile from "./pages/UserProfile";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import QRGenerator from "@/pages/QRGenerator";
+import UserProfile from "@/pages/UserProfile";
 
 function App() {
   return (
-    <BrowserRouter>
+    <Router>
       <Routes>
         <Route path="/" element={<QRGenerator />} />
-        <Route path="/user/:id" element={<UserProfile />} />
+        <Route path="/user/:userId" element={<UserProfile />} />
+        <Route path="*" element={<div className="text-center mt-10">404 Not Found</div>} />
       </Routes>
-    </BrowserRouter>
+    </Router>
   );
 }
 
