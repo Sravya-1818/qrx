@@ -1,4 +1,3 @@
-// src/pages/QRGenerator.tsx
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
 import QRCode from "qrcode.react";
@@ -50,14 +49,13 @@ const QRGenerator = () => {
       return;
     }
 
-    setQrData(`https://qrx-your-project.vercel.app/user/${user.id}`);
+    setQrData(`https://qrx.vercel.app/user/${user.id}`);
     setLoading(false);
   };
 
   return (
     <div className="max-w-3xl mx-auto p-6 mt-10 bg-white shadow-lg rounded-lg">
       <h1 className="text-3xl font-bold text-center text-blue-700 mb-6">Generate Your QR Badge</h1>
-
       <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Full Name" className="input-style" required />
         <input value={age} onChange={(e) => setAge(e.target.value)} placeholder="Age" className="input-style" />
@@ -66,20 +64,11 @@ const QRGenerator = () => {
         <input value={allergies} onChange={(e) => setAllergies(e.target.value)} placeholder="Allergies" className="input-style" />
         <input value={emergencyContact} onChange={(e) => setEmergencyContact(e.target.value)} placeholder="Emergency Contact" className="input-style" />
         <input value={reportsUrl} onChange={(e) => setReportsUrl(e.target.value)} placeholder="Reports URL (optional)" className="input-style md:col-span-2" />
-
-        <button
-          type="submit"
-          className="md:col-span-2 bg-blue-600 hover:bg-blue-700 text-white py-2 px-6 rounded transition duration-300"
-          disabled={loading}
-        >
+        <button type="submit" className="md:col-span-2 bg-blue-600 hover:bg-blue-700 text-white py-2 px-6 rounded" disabled={loading}>
           {loading ? "Generating..." : "Generate QR Code"}
         </button>
       </form>
-
-      {errorMsg && (
-        <p className="mt-4 text-red-600 text-center font-medium">{errorMsg}</p>
-      )}
-
+      {errorMsg && <p className="mt-4 text-red-600 text-center font-medium">{errorMsg}</p>}
       {qrData && (
         <div className="mt-10 text-center">
           <h2 className="text-xl font-semibold mb-2 text-gray-700">Your QR Code</h2>
