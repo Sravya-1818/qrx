@@ -1,12 +1,11 @@
-// src/pages/UserProfile.tsx
-import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 
 const UserProfile = () => {
   const { id } = useParams();
   const [profile, setProfile] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -16,34 +15,26 @@ const UserProfile = () => {
         .eq("id", id)
         .single();
 
-      if (error) {
-        console.error("Error fetching profile:", error);
-        setProfile(null);
-      } else {
-        setProfile(data);
-      }
-      setLoading(false);
+      if (error) setError(error.message);
+      else setProfile(data);
     };
 
-    if (id) fetchProfile();
+    fetchProfile();
   }, [id]);
 
-  if (loading) return <div className="p-4">Loading...</div>;
-  if (!profile) return <div className="p-4">Profile not found.</div>;
+  if (error) return <p className="text-red-600 text-center mt-10">{error}</p>;
+  if (!profile) return <p className="text-center mt-10">Loading...</p>;
 
   return (
-    <div className="max-w-xl mx-auto mt-10 p-6 bg-white rounded shadow">
-      <h1 className="text-2xl font-bold mb-4 text-blue-700">{profile.name}</h1>
+    <div className="max-w-xl mx-auto mt-10 bg-white p-6 shadow-md rounded">
+      <h1 className="text-2xl font-bold mb-4 text-blue-600">{profile.name}</h1>
       <p><strong>Age:</strong> {profile.age}</p>
       <p><strong>Blood Group:</strong> {profile.blood_group}</p>
-      <p><strong>Medical Conditions:</strong> {profile.conditions}</p>
+      <p><strong>Conditions:</strong> {profile.conditions}</p>
       <p><strong>Allergies:</strong> {profile.allergies}</p>
       <p><strong>Emergency Contact:</strong> {profile.emergency_contact}</p>
       {profile.reports_url && (
-        <p>
-          <strong>Reports:</strong>{" "}
-          <a href={profile.reports_url} target="_blank" className="text-blue-600 underline">View Report</a>
-        </p>
+        <p><strong>Reports:</strong> <a href={profile.reports_url} target="_blank" className="text-blue-500">View Report</a></p>
       )}
     </div>
   );
