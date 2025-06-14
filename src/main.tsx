@@ -1,23 +1,18 @@
-// src/main.tsx
-import React from "react";
-import ReactDOM from "react-dom/client";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import App from "./App";
-import QRGenerator from "./pages/QRGenerator";
-import UserProfile from "./pages/UserProfile";
-import Login from "./pages/Login";
-import NotFound from "./pages/NotFound";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import QRGenerator from "@/pages/QRGenerator";
+import UserProfile from "@/pages/UserProfile";
 
-ReactDOM.createRoot(document.getElementById("root")!).render(
-  <React.StrictMode>
-    <BrowserRouter>
+function App() {
+  return (
+    <Router>
       <Routes>
-        <Route path="/" element={<App />} />
-        <Route path="/generate" element={<QRGenerator />} />
-        <Route path="/user/:id" element={<UserProfile />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="*" element={<NotFound />} />
+        <Route path="/" element={<QRGenerator />} />
+        <Route path="/user/:userId" element={<UserProfile />} />
+        {/* Optional: Add 404 fallback */}
+        <Route path="*" element={<div className="text-center mt-10">404 Not Found</div>} />
       </Routes>
-    </BrowserRouter>
-  </React.StrictMode>
-);
+    </Router>
+  );
+}
+
+export default App;
