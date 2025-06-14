@@ -1,3 +1,4 @@
+// src/pages/QRGenerator.tsx
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
 import QRCode from "qrcode.react";
@@ -31,11 +32,11 @@ const QRGenerator = () => {
     }
 
     const profileData = {
-      id: user.id, // UUID, make sure 'id' column in Supabase is UUID
+      id: user.id,
       name,
       age,
       blood_group: bloodGroup,
-      conditions, // corrected spelling from 'condiitons'
+      conditions,
       allergies,
       emergency_contact: emergencyContact,
       reports_url: reportsUrl,
@@ -49,7 +50,6 @@ const QRGenerator = () => {
       return;
     }
 
-    // Set QR Code data linking to the user profile
     setQrData(`https://qrx-one.vercel.app/user/${user.id}`);
     setLoading(false);
   };
@@ -76,9 +76,7 @@ const QRGenerator = () => {
         </button>
       </form>
 
-      {errorMsg && (
-        <p className="mt-4 text-red-600 text-center font-medium">{errorMsg}</p>
-      )}
+      {errorMsg && <p className="mt-4 text-red-600 text-center font-medium">{errorMsg}</p>}
 
       {qrData && (
         <div className="mt-10 text-center">
