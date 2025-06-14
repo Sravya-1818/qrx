@@ -1,81 +1,87 @@
-import { useState } from "react";
-import { supabase } from "@/lib/supabase";
-import QRCode from "qrcode.react";
+import React, { useState } from "react";
+import { supabase } from "@/lib/supabase"; // adjust path if needed
+import QRCode from "react-qr-code";
+import { useUser } from "@supabase/auth-helpers-react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 
 const QRGenerator = () => {
-  const [name, setName] = useState("");
-  const [age, setAge] = useState("");
-  const [bloodGroup, setBloodGroup] = useState("");
-  const [conditions, setConditions] = useState("");
-  const [allergies, setAllergies] = useState("");
-  const [emergencyContact, setEmergencyContact] = useState("");
-  const [reportsUrl, setReportsUrl] = useState("");
-  const [qrData, setQrData] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [errorMsg, setErrorMsg] = useState("");
+  const user = useUser();
+  const [formData, setFormData] = useState({
+    name: "",
+    age: "",
+    blood_group: "",
+    conditions: "",
+    allergies: "",
+    emergency_contact: "",
+    reports_url: "",
+  });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setErrorMsg("");
+  const [qrUrl, setQrUrl] = useState("");
 
-    const {
-      data: { user },
-      error: userError,
-    } = await supabase.auth.getUser();
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
-    if (userError || !user) {
-      setErrorMsg("User not logged in.");
-      setLoading(false);
+  const handleGenerate = async () => {
+    if (!user) {
+      alert("Please login to generate a QR code.");
       return;
     }
 
     const profileData = {
       id: user.id,
-      name,
-      age,
-      blood_group: bloodGroup,
-      conditions,
-      allergies,
-      emergency_contact: emergencyContact,
-      reports_url: reportsUrl,
+      ...formData,
     };
 
     const { error } = await supabase.from("profiles").upsert(profileData);
-
     if (error) {
-      setErrorMsg(`Failed to save profile: ${error.message}`);
-      setLoading(false);
+      console.error("Error saving profile:", error.message);
+      alert("Failed to save profile. Please check console.");
       return;
     }
 
-    setQrData(`https://qrx.vercel.app/user/${user.id}`);
-    setLoading(false);
+    const url = `https://qrx-hl1sq91vo-sravya-valluris-projects.vercel.app`; // ✅ Replace with your Vercel domain
+    setQrUrl(url);
   };
 
   return (
-    <div className="max-w-3xl mx-auto p-6 mt-10 bg-white shadow-lg rounded-lg">
-      <h1 className="text-3xl font-bold text-center text-blue-700 mb-6">Generate Your QR Badge</h1>
-      <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Full Name" className="input-style" required />
-        <input value={age} onChange={(e) => setAge(e.target.value)} placeholder="Age" className="input-style" />
-        <input value={bloodGroup} onChange={(e) => setBloodGroup(e.target.value)} placeholder="Blood Group" className="input-style" />
-        <input value={conditions} onChange={(e) => setConditions(e.target.value)} placeholder="Medical Conditions" className="input-style" />
-        <input value={allergies} onChange={(e) => setAllergies(e.target.value)} placeholder="Allergies" className="input-style" />
-        <input value={emergencyContact} onChange={(e) => setEmergencyContact(e.target.value)} placeholder="Emergency Contact" className="input-style" />
-        <input value={reportsUrl} onChange={(e) => setReportsUrl(e.target.value)} placeholder="Reports URL (optional)" className="input-style md:col-span-2" />
-        <button type="submit" className="md:col-span-2 bg-blue-600 hover:bg-blue-700 text-white py-2 px-6 rounded" disabled={loading}>
-          {loading ? "Generating..." : "Generate QR Code"}
-        </button>
-      </form>
-      {errorMsg && <p className="mt-4 text-red-600 text-center font-medium">{errorMsg}</p>}
-      {qrData && (
-        <div className="mt-10 text-center">
-          <h2 className="text-xl font-semibold mb-2 text-gray-700">Your QR Code</h2>
-          <div className="inline-block bg-gray-100 p-4 rounded shadow">
-            <QRCode value={qrData} size={200} />
+    <div className="max-w-2xl mx-auto p-4">
+      <h1 className="text-3xl font-bold mb-6 text-center">Generate QR Health ID</h1>
+      
+      <div className="grid gap-4 mb-6">
+        {[
+          ["name", "Name"],
+          ["age", "Age"],
+          ["blood_group", "Blood Group"],
+          ["conditions", "Health Conditions"],
+          ["allergies", "Allergies"],
+          ["emergency_contact", "Emergency Contact"],
+          ["reports_url", "Reports URL"],
+        ].map(([name, label]) => (
+          <div key={name}>
+            <Label htmlFor={name}>{label}</Label>
+            <Input
+              id={name}
+              name={name}
+              value={(formData as any)[name]}
+              onChange={handleChange}
+              placeholder={`Enter ${label.toLowerCase()}`}
+            />
           </div>
-          <p className="mt-4 text-blue-600 font-medium break-all">{qrData}</p>
+        ))}
+      </div>
+
+      <Button onClick={handleGenerate} className="w-full bg-blue-600 text-white">
+        Generate QR Code
+      </Button>
+
+      {qrUrl && (
+        <div className="mt-8 text-center">
+          <h2 className="text-xl font-semibold mb-2">Scan this QR</h2>
+          <QRCode value={qrUrl} />
+          <p className="mt-2 text-sm text-gray-600 break-all">{qrUrl}</p>
         </div>
       )}
     </div>
