@@ -50,7 +50,7 @@ const QRGenerator = () => {
       return;
     }
 
-    setQrData(`https://qrx-one.vercel.app/user/${user.id}`);
+    setQrData(`https://qrx-your-project.vercel.app/user/${user.id}`);
     setLoading(false);
   };
 
