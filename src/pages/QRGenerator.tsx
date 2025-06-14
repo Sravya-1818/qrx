@@ -37,7 +37,7 @@ const QRGenerator = () => {
       blood_group: bloodGroup,
       condiitons: conditions,
       allergies,
-      exmergency_contact: emergencyContact,
+      emergency_contact: emergencyContact,
       reports_url: reportsUrl,
     };
 
